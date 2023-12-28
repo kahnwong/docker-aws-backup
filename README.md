@@ -1,3 +1,3 @@
 # docker-aws-backup
 
-AWS CLI image with tar and gzip.
+AWS CLI image with tar, gzip, postgresql.
