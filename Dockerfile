@@ -1,5 +1,7 @@
-FROM amazon/aws-cli:latest
+FROM nixos/nix:latest
 
-RUN yum update -y && \
-    yum install -y tar gzip postgresql && \
-    yum clean all
+RUN nix-channel --update
+RUN nix-env -iA nixpkgs.awscli2 && \
+  nix-env -iA nixpkgs.gnutar && \
+  nix-env -iA nixpkgs.gzip && \
+  nix-env -iA nixpkgs.postgresql
