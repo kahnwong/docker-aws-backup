@@ -4,6 +4,7 @@
 #MODE= # `ARCHIVE`
 #SERVICE_NAME=
 #BACKUP_PATH=
+#BACKUP_PATH_EXCLUDED= # optional
 
 # set filename
 current_date=$(date +%Y-%m-%d)
@@ -12,7 +13,11 @@ filename="$SERVICE_NAME-$current_date.tar.gz"
 
 # backup
 if [ "$MODE" = "ARCHIVE" ]; then
-	tar -czf "$filename" "$BACKUP_PATH"
+	if [ -z "${BACKUP_PATH_EXCLUDED+x}" ]; then
+		tar -czf "$filename" "$BACKUP_PATH"
+	else
+		tar --exclude "$BACKUP_PATH_EXCLUDED" -czf "$filename" "$BACKUP_PATH"
+	fi
 else
 	echo "$MODE is not  supported"
 fi
