@@ -1,5 +1,10 @@
 #!/bin/sh
 
+## VARS
+#MODE= # `ARCHIVE`
+#SERVICE_NAME=
+#BACKUP_PATH=
+
 # set filename
 current_date=$(date +%Y-%m-%d)
 backup_prefix="s3://backup/$current_date"
