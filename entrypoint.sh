@@ -30,7 +30,7 @@ elif [ "$MODE" = "DB_POSTGRES" ]; then
 	PGPASSWORD="$POSTGRES_PASSWORD" pg_dump -Fc -c -U "$POSTGRES_USERNAME" --host "$POSTGRES_HOSTNAME" >"$filename"
 
 else
-	echo "$MODE is not  supported"
+	echo "$MODE is not supported"
 fi
 
 # upload
