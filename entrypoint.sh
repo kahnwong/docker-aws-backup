@@ -12,6 +12,7 @@
 #POSTGRES_HOSTNAME=
 
 #S3_ENDPOINT= # optional
+#NTFY_TOPIC
 
 # set filename
 current_date=$(date +%Y-%m-%d)
@@ -46,4 +47,4 @@ if [ -v S3_ENDPOINT ]; then
 fi
 
 aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
-curl -d "Successfully backup $SERVICE_NAME" https://ntfy.karnwong.me/nuc-backup
+curl -d "Successfully backup $SERVICE_NAME" "$NTFY_TOPIC"

@@ -11,7 +11,8 @@ RUN nix-env -iA nixpkgs.bash && \
 
 # set entrypoint
 WORKDIR /opt/backup
-COPY entrypoint.sh .
+# hadolint ignore=DL3020
+ADD entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
