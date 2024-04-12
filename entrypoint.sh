@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## VARS
 #MODE= # `ARCHIVE`, `DB_POSTGRES`
@@ -19,11 +19,16 @@ backup_prefix="s3://backup/$current_date"
 if [ "$MODE" = "ARCHIVE" ]; then
 	filename="$SERVICE_NAME-$current_date.tar.gz"
 
-	if [ -z "${BACKUP_PATH_EXCLUDE+x}" ]; then
-		tar -czf "$filename" "$BACKUP_PATH"
-	else
-		tar --exclude "$BACKUP_PATH_EXCLUDE" -czf "$filename" "$BACKUP_PATH"
+	# ref: https://stackoverflow.com/a/42985721
+	tar_args=(
+		-czf "$filename" "$BACKUP_PATH"
+		-stdout
+	)
+	if [ -v BACKUP_PATH_EXCLUDE ]; then
+		args+=(--exclude "$BACKUP_PATH_EXCLUDE")
 	fi
+
+	tar "${tar_args[@]}"
 
 elif [ "$MODE" = "DB_POSTGRES" ]; then
 	filename="$SERVICE_NAME-sqldump-$current_date.bin"
