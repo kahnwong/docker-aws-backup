@@ -27,7 +27,7 @@ if [ "$MODE" = "ARCHIVE" ]; then
 		-czf "$filename" "$BACKUP_PATH"
 	)
 	if [ -v BACKUP_PATH_EXCLUDE ]; then
-		args+=(--exclude "$BACKUP_PATH_EXCLUDE")
+		tar_args+=(--exclude "$BACKUP_PATH_EXCLUDE")
 	fi
 
 	tar "${tar_args[@]}"
@@ -43,7 +43,7 @@ fi
 # upload
 aws_args=()
 if [ -v S3_ENDPOINT ]; then
-	args+=(--endpoint-url "$S3_ENDPOINT")
+	aws_args+=(--endpoint-url "$S3_ENDPOINT")
 fi
 
 aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
