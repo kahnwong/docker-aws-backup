@@ -23,12 +23,13 @@ if [ "$MODE" = "ARCHIVE" ]; then
 	filename="$SERVICE_NAME-$current_date.tar.gz"
 
 	# ref: https://stackoverflow.com/a/42985721
-	tar_args=(
-		-czf "$filename" "$BACKUP_PATH"
-	)
+	tar_args=()
 	if [ -v BACKUP_PATH_EXCLUDE ]; then
 		tar_args+=(--exclude "$BACKUP_PATH_EXCLUDE")
 	fi
+	tar_args+=(
+		-czf "$filename" "$BACKUP_PATH"
+	)
 
 	tar "${tar_args[@]}"
 
