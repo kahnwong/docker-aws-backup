@@ -5,7 +5,7 @@
 #SERVICE_NAME=
 #BACKUP_PATH=
 
-#BACKUP_PATH_EXCLUDED= # optional
+#BACKUP_PATH_EXCLUDE= # optional
 
 #POSTGRES_USERNAME=
 #POSTGRES_PASSWORD=
@@ -19,10 +19,10 @@ backup_prefix="s3://backup/$current_date"
 if [ "$MODE" = "ARCHIVE" ]; then
 	filename="$SERVICE_NAME-$current_date.tar.gz"
 
-	if [ -z "${BACKUP_PATH_EXCLUDED+x}" ]; then
+	if [ -z "${BACKUP_PATH_EXCLUDE+x}" ]; then
 		tar -czf "$filename" "$BACKUP_PATH"
 	else
-		tar --exclude "$BACKUP_PATH_EXCLUDED" -czf "$filename" "$BACKUP_PATH"
+		tar --exclude "$BACKUP_PATH_EXCLUDE" -czf "$filename" "$BACKUP_PATH"
 	fi
 
 elif [ "$MODE" = "DB_POSTGRES" ]; then
