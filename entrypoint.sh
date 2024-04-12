@@ -11,6 +11,8 @@
 #POSTGRES_PASSWORD=
 #POSTGRES_HOSTNAME=
 
+#S3_ENDPOINT= # optional
+
 # set filename
 current_date=$(date +%Y-%m-%d)
 backup_prefix="s3://backup/$current_date"
@@ -22,7 +24,6 @@ if [ "$MODE" = "ARCHIVE" ]; then
 	# ref: https://stackoverflow.com/a/42985721
 	tar_args=(
 		-czf "$filename" "$BACKUP_PATH"
-		-stdout
 	)
 	if [ -v BACKUP_PATH_EXCLUDE ]; then
 		args+=(--exclude "$BACKUP_PATH_EXCLUDE")
@@ -39,5 +40,10 @@ else
 fi
 
 # upload
-aws s3 cp --endpoint-url "$S3_ENDPOINT" "$filename" "$backup_prefix/$filename"
+aws_args=()
+if [ -v S3_ENDPOINT ]; then
+	args+=(--endpoint-url "$S3_ENDPOINT")
+fi
+
+aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
 curl -d "Successfully backup $SERVICE_NAME" https://ntfy.karnwong.me/nuc-backup
