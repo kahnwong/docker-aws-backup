@@ -4,6 +4,7 @@
 #MODE= # `ARCHIVE`, `DB_POSTGRES`
 #SERVICE_NAME=
 #BACKUP_PATH=
+#BUCKET_NAME=
 
 #BACKUP_PATH_EXCLUDE= # optional
 
@@ -16,7 +17,9 @@
 
 # set filename
 current_date=$(date +%Y-%m-%d)
-backup_prefix="s3://backup/$current_date"
+
+backup_bucket="${BUCKET_NAME:-backup}"
+backup_prefix="s3://$backup_bucket/$current_date"
 
 # backup
 if [ "$MODE" = "ARCHIVE" ]; then
