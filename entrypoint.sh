@@ -14,7 +14,7 @@
 #S3_ENDPOINT= # optional
 
 # either of this
-#NTFY_TOPIC
+#NTFY_TOPIC_URL
 #DISCORD_WEBHOOK_URL
 
 # set filename
@@ -55,8 +55,8 @@ aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
 
 # notify
 notify_message="Successfully backup $SERVICE_NAME"
-if [ -v NTFY_TOPIC ]; then
-	curl -d "$notify_message" "$NTFY_TOPIC"
+if [ -v NTFY_TOPIC_URL ]; then
+	curl -d "$notify_message" "$NTFY_TOPIC_URL"
 elif [ -v DISCORD_WEBHOOK_URL ]; then
 	curl -i \
 		-H "Accept: application/json" \
