@@ -1,11 +1,10 @@
 #!/bin/bash
 
-## VARS
+# ----------------- VARS ----------------- #
 #MODE= # `ARCHIVE`, `DB_POSTGRES`
 #SERVICE_NAME=
 #BACKUP_PATH=
 #BUCKET_NAME=
-
 #BACKUP_PATH_EXCLUDE= # optional
 
 #POSTGRES_USERNAME=
@@ -13,7 +12,10 @@
 #POSTGRES_HOSTNAME=
 
 #S3_ENDPOINT= # optional
+
+# either of this
 #NTFY_TOPIC
+#DISCORD_WEBHOOK_URL
 
 # set filename
 current_date=$(date +%Y-%m-%d)
@@ -49,6 +51,18 @@ aws_args=()
 if [ -v S3_ENDPOINT ]; then
 	aws_args+=(--endpoint-url "$S3_ENDPOINT")
 fi
-
 aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
-curl -d "Successfully backup $SERVICE_NAME" "$NTFY_TOPIC"
+
+# notify
+notify_message="Successfully backup $SERVICE_NAME"
+if [ -v NTFY_TOPIC ]; then
+	curl -d "$notify_message" "$NTFY_TOPIC"
+elif [ -v DISCORD_WEBHOOK_URL ]; then
+	curl -i \
+		-H "Accept: application/json" \
+		-H "Content-Type:application/json" \
+		-X POST --data "{\"content\": \"$notify_message\"}" \
+		"$DISCORD_WEBHOOK_URL"
+else
+	echo "Cannot send a notification since no notification backend has been configured."
+fi
