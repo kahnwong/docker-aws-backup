@@ -6,7 +6,7 @@ RUN nix-env -iA nixpkgs.bash && \
   nix-env -iA nixpkgs.gnutar && \
   nix-env -iA nixpkgs.gzip && \
   nix-env -iA nixpkgs.curl && \
-  nix-env -iA nixpkgs.postgresql_16 && \
+  nix-env -iA nixpkgs.postgresql_17 && \
   nix-env -iA nixpkgs.awscli2
 
 # set entrypoint
