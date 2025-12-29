@@ -3,7 +3,7 @@ FROM nixos/nix:latest AS builder
 
 # hadolint ignore=DL3059
 RUN nix-channel --update && \
-    nix-env -iA nixpkgs.bash nixpkgs.gnutar nixpkgs.gzip nixpkgs.curl nixpkgs.postgresql_17 nixpkgs.awscli2
+    nix-env -iA nixpkgs.bash nixpkgs.gnutar nixpkgs.gzip nixpkgs.curl nixpkgs.postgresql_18 nixpkgs.awscli2
 
 # Use nix-store to identify exactly what is needed and copy it to a specific path
 # hadolint ignore=SC2046
