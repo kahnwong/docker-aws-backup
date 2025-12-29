@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 
 # ----------------- VARS ----------------- #
 #MODE= # `ARCHIVE`, `DB_POSTGRES`
