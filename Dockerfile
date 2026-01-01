@@ -10,8 +10,7 @@ RUN nix-channel --update && \
 RUN mkdir -p /tmp/nix-store-closure && \
     cp -R $(nix-store -qR $(which bash gnutar gzip curl psql aws)) /tmp/nix-store-closure
 
-# hadolint ignore=DL3007
-FROM alpine:latest
+FROM debian:trixie-slim
 COPY --from=builder /tmp/nix-store-closure /nix/store
 COPY --from=builder /root/.nix-profile/bin /usr/local/bin
 
