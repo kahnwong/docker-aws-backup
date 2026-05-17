@@ -25,44 +25,57 @@ backup_prefix="s3://$backup_bucket/$current_date"
 
 # backup
 if [ "$MODE" = "ARCHIVE" ]; then
-	filename="$SERVICE_NAME-$current_date.tar.gz"
+  filename="$SERVICE_NAME-$current_date.tar.gz"
 
-	# ref: https://stackoverflow.com/a/42985721
-	tar_args=()
-	if [ -v BACKUP_PATH_EXCLUDE ]; then
-		tar_args+=(--exclude "$BACKUP_PATH_EXCLUDE")
-	fi
-	tar_args+=(
-		-czf "$filename" "$BACKUP_PATH"
-	)
-
-	tar "${tar_args[@]}"
+  # ref: https://stackoverflow.com/a/42985721
+  tar_args=()
+  if [ -v BACKUP_PATH_EXCLUDE ]; then
+    tar_args+=(--exclude "$BACKUP_PATH_EXCLUDE")
+  fi
+  tar_args+=(
+    -czf - "$BACKUP_PATH"
+  )
+  upload_stdin=1
 
 elif [ "$MODE" = "DB_POSTGRES" ]; then
-	filename="$SERVICE_NAME-sqldump-$current_date.bin"
-	PGPASSWORD="$POSTGRES_PASSWORD" pg_dump -Fc -c -U "$POSTGRES_USERNAME" --host "$POSTGRES_HOSTNAME" >"$filename"
+  filename="$SERVICE_NAME-sqldump-$current_date.bin"
+  pg_dump_args=(
+    -Fc
+    -c
+    -U "$POSTGRES_USERNAME"
+    --host "$POSTGRES_HOSTNAME"
+  )
+  upload_stdin=1
 
 else
-	echo "$MODE is not supported"
+  echo "$MODE is not supported"
 fi
 
 # upload
 aws_args=()
 if [ -v S3_ENDPOINT ]; then
-	aws_args+=(--endpoint-url "$S3_ENDPOINT")
+  aws_args+=(--endpoint-url "$S3_ENDPOINT")
 fi
-aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
+if [ "${upload_stdin:-0}" = "1" ]; then
+  if [ "$MODE" = "ARCHIVE" ]; then
+    tar "${tar_args[@]}" | aws s3 cp "${aws_args[@]}" - "$backup_prefix/$filename"
+  elif [ "$MODE" = "DB_POSTGRES" ]; then
+    PGPASSWORD="$POSTGRES_PASSWORD" pg_dump "${pg_dump_args[@]}" | aws s3 cp "${aws_args[@]}" - "$backup_prefix/$filename"
+  fi
+else
+  aws s3 cp "${aws_args[@]}" "$filename" "$backup_prefix/$filename"
+fi
 
 # notify
 notify_message="Successfully backup $SERVICE_NAME"
 if [ -v NTFY_TOPIC_URL ]; then
-	curl -d "$notify_message" "$NTFY_TOPIC_URL"
+  curl -d "$notify_message" "$NTFY_TOPIC_URL"
 elif [ -v DISCORD_WEBHOOK_URL ]; then
-	curl -i \
-		-H "Accept: application/json" \
-		-H "Content-Type:application/json" \
-		-X POST --data "{\"content\": \"$notify_message\"}" \
-		"$DISCORD_WEBHOOK_URL"
+  curl -i \
+    -H "Accept: application/json" \
+    -H "Content-Type:application/json" \
+    -X POST --data "{\"content\": \"$notify_message\"}" \
+    "$DISCORD_WEBHOOK_URL"
 else
-	echo "Cannot send a notification since no notification backend has been configured."
+  echo "Cannot send a notification since no notification backend has been configured."
 fi
